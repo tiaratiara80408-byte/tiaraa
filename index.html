@@ -1,12 +1,23 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Volley App</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              // Custom colors can be added here
+            }
+          }
+        }
+      }
+    </script>
     <style>
       body {
           overscroll-behavior-y: contain;
@@ -23,7 +34,7 @@
 }
 </script>
 </head>
-  <body class="bg-slate-900 text-white">
+  <body class="bg-gray-100 text-slate-900 dark:bg-slate-900 dark:text-white transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import DashboardView from './views/DashboardView';
@@ -22,6 +22,25 @@ const App: React.FC = () => {
   const [cart, setCart] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  // Initialize dark mode state, checking localStorage or defaulting to true
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    return savedMode ? JSON.parse(savedMode) : true;
+  });
+
+  // Apply dark mode class to html element
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev: boolean) => !prev);
+  };
 
   const showNotification = (message: string) => {
     setNotification(message);
@@ -53,13 +72,22 @@ const App: React.FC = () => {
     showNotification("Pembelian berhasil!");
   };
 
-  const handleLogin = () => {
+  // Modified to accept optional user data from registration
+  const handleLogin = (userData?: Partial<User>) => {
+    if (userData) {
+      setUser(prev => ({ ...prev, ...userData }));
+      showNotification(`Selamat datang, ${userData.name || 'Coach'}!`);
+    } else {
+      showNotification("Login berhasil!");
+    }
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setCurrentPage('dashboard');
+    // Reset to mock user on logout for demo purposes
+    setUser(mockUser); 
   };
 
   if (!isAuthenticated) {
@@ -79,7 +107,13 @@ const App: React.FC = () => {
       case 'chat':
         return <ChatView />;
       case 'profil':
-        return <ProfileView user={user} onLogout={handleLogout} showNotification={showNotification} />;
+        return <ProfileView 
+          user={user} 
+          onLogout={handleLogout} 
+          showNotification={showNotification} 
+          isDarkMode={isDarkMode}
+          toggleDarkMode={toggleDarkMode}
+        />;
       case 'training':
         return <TrainingView />;
       default:
@@ -88,7 +122,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen font-sans bg-slate-900 text-gray-200">
+    <div className="min-h-screen font-sans bg-gray-100 text-slate-900 dark:bg-slate-900 dark:text-gray-200 transition-colors duration-300">
       <Notification message={notification} />
       <CartModal 
         isOpen={isCartOpen} 
@@ -97,12 +131,12 @@ const App: React.FC = () => {
         onRemove={handleRemoveFromCart}
         onCheckout={handleCheckout}
       />
-      <div className="max-w-md mx-auto h-screen flex flex-col">
+      <div className="max-w-md mx-auto h-screen flex flex-col bg-gray-100 dark:bg-slate-900 shadow-2xl overflow-hidden">
         <Header 
           cartItemCount={cart.length} 
           onCartClick={() => setIsCartOpen(true)} 
         />
-        <main className="flex-grow overflow-y-auto pb-20 px-4">
+        <main className="flex-grow overflow-y-auto pb-20 px-4 bg-gray-100 dark:bg-slate-900 transition-colors duration-300 scrollbar-hide">
           {renderContent()}
         </main>
         <BottomNav currentPage={currentPage} setCurrentPage={setCurrentPage} />

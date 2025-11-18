@@ -94,5 +94,6 @@ export interface BeginnerGuide {
   id: number;
   title: string;
   description: string;
+  imageUrl?: string;
   steps: { title: string; detail: string }[];
 }
